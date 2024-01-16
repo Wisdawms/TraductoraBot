@@ -1,2 +1,2 @@
 # TraductoraBot
- Translation bot for Telegram chats. (by Wisdoms)
+ Translation bot for Telegram chats. <sup>use as you like 😊</sup>
