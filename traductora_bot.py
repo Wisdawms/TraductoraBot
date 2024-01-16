@@ -146,7 +146,7 @@ def translate_two_flags(message):
                     print(to_lang)
                     translation = gtrans.translate(text=message.reply_to_message.text, dest=to_lang, src=from_lang).text
                     print(translation)
-                    bot.reply_to(message.reply_to_message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```{translation}```",parse_mode='Markdown')
+                    bot.reply_to(message.reply_to_message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     bot.delete_message(message.chat.id, message.message_id)
                     return
                 else:
@@ -160,7 +160,7 @@ def translate_two_flags(message):
                             print("from lang at line 153:", from_lang)
                         print("from lang at line 160:", from_lang)
                         translation = gtrans.translate(text=text_to_trans, dest=to_lang, src=from_lang).text
-                        bot.reply_to(message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```{translation}```",parse_mode='Markdown')
+                        bot.reply_to(message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     else:
                         bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, Please reply to this message with the text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                         #bot_reply_msg = bot.reply_to(message, f"{message.from_user.first_name}, Please reply to this message with the text you wish to translate to {to_lang.upper()}")
@@ -194,12 +194,12 @@ def translate_any_es(message):
             print(from_lang)
             match from_lang:
                 case "en":
-                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇸:\n\n```{translation}```",parse_mode='Markdown')
+                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇸:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     return
                 case "ar":
-                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇪🇸:\n\n```{translation}```",parse_mode='Markdown')
+                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇪🇸:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     return
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, Please reply to this message with the text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
@@ -222,12 +222,12 @@ def translate_any_en(message):
             print("from lang at line 207:", from_lang)
             match from_lang:
                 case "es":
-                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇬🇧:\n\n```{translation}```",parse_mode='Markdown')
+                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇬🇧:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     return
                 case "ar":
-                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇬🇧:\n\n```{translation}```",parse_mode='Markdown')
+                    bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇬🇧:\n\n```\n{translation}```",parse_mode='MarkdownV2')
                     return
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to EN:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to EN:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, Please reply to this message with the text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
@@ -248,7 +248,7 @@ def translate_any_ar(message):
                 from_lang = from_lang[0]
             print("from lang at line 232:", from_lang)
             translation = gtrans.translate(text=text_to_trans, dest='ar').text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to AR:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to AR:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, Please reply to this message with the text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
@@ -264,7 +264,7 @@ def translate_en_es(message):
         if message.text.split()[1]:
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest='es',src='en').text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇸:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇸:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "Please input English text to translate it into Spanish")
@@ -283,7 +283,7 @@ def translate_es_en(message):
         if message.text.split()[1]:
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest='en',src='es').text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇬🇧:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇬🇧:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "Please input Spanish text to translate it into English")
@@ -303,7 +303,7 @@ def translate_es_ar(message):
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest='ar',src='es').text
             print("here")
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇪🇬:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇪🇬:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "Please input Spanish text to translate it into Arabic")
@@ -324,7 +324,7 @@ def translate_ar_es(message):
         if message.text.split()[1]:
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest=from_lang,src=to_lang).text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇪🇸:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇪🇸:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "معلش إكتب حاجة بالعربي عشان تترجمها اساني 😊")
@@ -345,7 +345,7 @@ def translate_ar_en(message):
         if message.text.split()[1]:
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest=from_lang,src=to_lang).text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇬🇧:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇬🇧:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "معلش إكتب حاجة بالعربي عشان تترجمها انجليزي 😊")
@@ -366,7 +366,7 @@ def translate_en_ar(message):
         if message.text.split()[1]:
             text_to_trans = " ".join(message.text.split()[1:])
             translation = gtrans.translate(text=text_to_trans, dest=from_lang,src=to_lang).text
-            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇬:\n\n```{translation}```",parse_mode='Markdown')
+            bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇬:\n\n```\n{translation}```",parse_mode='MarkdownV2')
 
     except:
         #bot.reply_to(message, "Please input English text to translate into Arabic 😊")
@@ -423,7 +423,7 @@ def callback_query(call):
             translation = gtrans.translate(text=text_to_trans, dest='fr').text
             to_lang = "fr"
     if call.message.reply_to_message.text.split()[0].replace(call.message.reply_to_message.text[0],"").lower() in ("t", "translate", "ت") and len(call.message.reply_to_message.text.split()) > 1:
-        bot.reply_to(call.message.reply_to_message, f"{call.message.reply_to_message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```{translation}```",parse_mode='Markdown')
+        bot.reply_to(call.message.reply_to_message, f"{call.message.reply_to_message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='MarkdownV2')
         bot.delete_message(call.message.chat.id, call.message.id)
     else:
         bot_reply_msg = bot.send_message(call.message.chat.id, f"{call.message.reply_to_message.from_user.first_name}, Reply to this message with the text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=call.message.reply_to_message.message_id)
@@ -443,7 +443,7 @@ def handle_trans_reply(message, to_lang, flag_msg, from_lang):
                 from_lang = from_lang[0]
             print("from lang at line 423:", from_lang)
         translation = gtrans.translate(text=text_to_trans, dest=to_lang, src=from_lang).text
-        bot.reply_to(message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```{translation}```",parse_mode='Markdown')
+        bot.reply_to(message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='MarkdownV2')
         bot.delete_message(message.chat.id, message.reply_to_message.message_id)
         if flag_msg:
             if flag_msg.reply_to_message: # choose a language text
