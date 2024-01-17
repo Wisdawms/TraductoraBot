@@ -6,11 +6,10 @@ import requests
 from googletrans import Translator
 import re
 import speech_recognition as sr
-import io
 from pydub import AudioSegment
-from pydub.playback import play
 import azure.cognitiveservices.speech as speechsdk
 from babel import Locale
+import json
 
 
 global global_from_lang, global_to_lang
@@ -661,7 +660,6 @@ def init_voice_trans(message):
 
 #@bot.message_handler(content_types=["voice"])
 def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_locale, to_locale):
-    RECOGNIZED_LANG=None
     global global_from_lang
     global global_to_lang
     print("TRANSLATE VOICE", from_locale, to_locale)
@@ -685,7 +683,8 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
     recognizer = sr.Recognizer()
     with sr.AudioFile("voice_note.wav") as source:
         transcription=None
-        audio_data = recognizer.record(source)
+        recognizer.adjust_for_ambient_noise(source)
+        #audio_data = recognizer.record(source)
         speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region="westeurope")
         audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
 #         locales = [
@@ -707,11 +706,10 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
 # ]
         
         # Your list of locales
-        locales_2 = ['af-ZA', 'am-ET', 'ar-AE', 'ar-BH', 'ar-DZ', 'ar-EG', 'ar-IL', 'ar-IQ', 'ar-JO', 'ar-KW', 'ar-LB', 'ar-LY', 'ar-MA', 'ar-OM', 'ar-PS', 'ar-QA', 'ar-SA', 'ar-SY', 'ar-TN', 'ar-YE', 'az-AZ', 'bg-BG', 'bn-IN', 'bs-BA', 'ca-ES', 'cs-CZ', 'cy-GB', 'da-DK', 'de-AT', 'de-CH', 'de-DE', 'el-GR', 'en-AU', 'en-CA', 'en-GB', 'en-GH', 'en-HK', 'en-IE', 'en-IN', 'en-KE', 'en-NG', 'en-NZ', 'en-PH', 'en-SG', 'en-TZ', 'en-US', 'en-ZA', 'es-AR', 'es-BO', 'es-CL', 'es-CO', 'es-CR', 'es-CU', 'es-DO', 'es-EC', 'es-ES', 'es-GQ', 'es-GT', 'es-HN', 'es-MX', 'es-NI', 'es-PA', 'es-PE', 'es-PR', 'es-PY', 'es-SV', 'es-US', 'es-UY', 'es-VE', 'et-EE', 'eu-ES', 'fa-IR', 'fi-FI', 'fil-PH', 'fr-BE', 'fr-CA', 'fr-CH', 'fr-FR', 'ga-IE', 'gl-ES', 'gu-IN', 'he-IL', 'hi-IN', 'hr-HR', 'hu-HU', 'hy-AM', 'id-ID', 'is-IS', 'it-CH', 'it-IT', 'ja-JP', 'jv-ID', 'ka-GE', 'kk-KZ', 'km-KH', 'kn-IN', 'ko-KR', 'lo-LA', 'lt-LT', 'lv-LV', 'mk-MK', 'ml-IN', 'mn-MN', 'mr-IN', 'ms-MY', 'mt-MT', 'my-MM', 'nb-NO', 'ne-NP', 'nl-BE', 'nl-NL', 'pa-IN', 'pl-PL', 'ps-AF', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI', 'so-SO', 'sq-AL', 'sr-RS', 'sv-SE', 'sw-KE', 'sw-TZ', 'ta-IN', 'te-IN', 'th-TH', 'tr-TR', 'uk-UA', 'ur-IN', 'uz-UZ', 'vi-VN', 'wuu-CN', 'yue-CN', 'zh-CN', 'zh-CN-shandong', 'zh-CN-sichuan', 'zh-HK', 'zh-TW', 'zu-ZA']
+        locales_2 = ['en-US', 'es-ES','ar-AE', 'fr-FR','ja-JP', 'zh-CN', 'hi-IN', 'id-ID', 'pt-BR', 'ru-RU', 'bn-IN', 'vi-VN', 'ur-IN', 'de-DE', 'ko-KR', 'it-IT', 'tr-TR', 'ta-IN', 'fil-PH', 'pl-PL', 'uk-UA', 'ro-RO', 'nl-NL', 'th-TH', 'el-GR', 'cs-CZ', 'hu-HU', 'sv-SE', 'he-IL', 'ms-MY', 'ml-IN', 'te-IN', 'da-DK', 'fi-FI', 'sk-SK', 'nb-NO', 'zh-CN-shandong', 'yue-CN', 'zh-CN-sichuan', 'zh-HK', 'zh-TW', 'zu-ZA', 'ca-ES', 'my-MM', 'is-IS', 'lv-LV', 'lt-LT', 'mk-MK', 'si-LK', 'sl-SI', 'sq-AL', 'hy-AM', 'eu-ES', 'hr-HR', 'sr-RS', 'bs-BA', 'ka-GE', 'kk-KZ', 'mt-MT', 'km-KH', 'kn-IN', 'lo-LA', 'mr-IN', 'mn-MN', 'ne-NP', 'ps-AF', 'pa-IN', 'en-ZA', 'gl-ES', 'gu-IN', 'it-CH', 'jv-ID', 'nl-BE', 'pt-PT', 'sw-KE', 'sw-TZ', 'af-ZA', 'am-ET', 'ar-BH', 'ar-DZ', 'ar-EG', 'ar-IL', 'ar-IQ', 'ar-JO', 'ar-KW', 'ar-LB', 'ar-LY', 'ar-MA', 'ar-OM', 'ar-PS', 'ar-QA', 'ar-SA', 'ar-SY', 'ar-TN', 'ar-YE', 'az-AZ', 'bg-BG', 'cy-GB', 'de-AT', 'de-CH', 'en-AU', 'en-CA', 'en-GB', 'en-GH', 'en-HK', 'en-IE', 'en-IN', 'en-KE', 'en-NG', 'en-NZ', 'en-PH', 'en-SG', 'en-TZ', 'es-AR', 'es-BO', 'es-CL', 'es-CO', 'es-CR', 'es-CU', 'es-DO', 'es-EC', 'es-GQ', 'es-GT', 'es-HN', 'es-MX', 'es-NI', 'es-PA', 'es-PE', 'es-PR', 'es-PY', 'es-SV', 'es-US', 'es-UY', 'es-VE', 'et-EE', 'fa-IR', 'fr-BE', 'fr-CA', 'fr-CH', 'ga-IE', 'so-SO', 'uz-UZ', 'wuu-CN']
        
         if from_lang is None:
             print("NO FROM LANG PROVIDED, USING THE AUTO CONFIG")
-
             grouped_locales = [locales_2[i:i+4] for i in range(0, len(locales_2), 4)]
 
             # Create language configurations for each set
@@ -725,51 +723,28 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
 
             # Use the configurations in your speech recognizer
             for auto_detect_config in auto_detect_configs:
+                print("current auto det config:", auto_detect_config)
                 speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, auto_detect_source_language_config=auto_detect_config, audio_config=audio_config)
                 result = speech_recognizer.recognize_once()
-                if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-                    print(result)
-                    break
+                if isinstance(gtrans.detect(result.text).confidence, list):
+                    if gtrans.detect(result.text).confidence[0] > 0.81:
+                        break
+                else:
+                    if gtrans.detect(result.text).confidence > 0.81:
+                        break
 
         else:
             print("FROM LANG PROVIDED, USING THAT LOCALE")
-            speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,language=from_locale,audio_config=audio_config)
+            speech_recognizer = speechsdk.SpeechRecognizer(speech_config, language=from_locale,audio_config=audio_config)
             result = speech_recognizer.recognize_once()
         # Group locales into sets of 4
         
-
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
             auto_detect_result = speechsdk.AutoDetectSourceLanguageResult(result)
             transcription = result.text
             recognized_lang = auto_detect_result.language
             print("Recognized: {} in language {}".format(transcription, recognized_lang))
 
-            
-
-
-        # match picked_region:
-        #     case "euwest":
-        #         #transcription = recognizer.recognize_azure(audio_data, key='a72af3632e1e4ae3826210e3c76b56d9', location='westeurope')[0]
-        #         speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region="westeurope")
-        #         audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
-        #         lang_configs= [speechsdk.languageconfig.SourceLanguageConfig("en-US"),
-        #         speechsdk.languageconfig.SourceLanguageConfig("es-ES"), speechsdk.languageconfig.SourceLanguageConfig("ar-EG")
-        #         ]
-        #         auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(sourceLanguageConfigs=lang_configs)
-        #         speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,auto_detect_source_language_config=auto_detect_source_language_config,audio_config=audio_config)
-        #         result = speech_recognizer.recognize_once()
-        #         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-        #             auto_detect_source_language_result = speechsdk.AutoDetectSourceLanguageResult(result)
-        #             transcription = result.text
-        #             print("Recognized: {} in language {}".format(result.text, auto_detect_source_language_result.language))
-        #     case "uaenorth":
-        #         transcription = recognizer.recognize_azure(audio_data, key='b1846da7cbb6402cae4c02b87d636d38', location='uaenorth',  language='ar-EG')[0]
-        #     case "qatar":
-        #         transcription = recognizer.recognize_azure(audio_data, key='ce5838858ee74d06bb954d8af2da9d1c', location='qatarcentral', language='ar-QA')[0]
-        #         print("transcribing with the qatar region")
-        #     case None:
-        #         translate_voice(message,from_lang,to_lang)
-        #         return
 
         if transcription is None:
             bot.reply_to(message, "Couldn't detect speech! Please try again.")
@@ -785,10 +760,13 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
                 bot.reply_to(message, "`Couldn't detect language! Please try again.`")
                 return
         print(from_lang)
+        if isinstance(from_lang, list):
+            from_lang = from_lang[0]
+        det = gtrans.detect(transcription)
+        print("GTRANS DETECTION: ", det)
         translation = gtrans.translate(transcription, src=from_lang, dest=to_lang)
         print(transcription,translation.text)
         print(from_locale, to_locale)
-        print(RECOGNIZED_LANG)
         if from_locale != 'en':
             bot.reply_to(message, f"\n`Translated from {from_locale}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
         else:
@@ -834,6 +812,5 @@ def region_callback(call):
 bot.polling()
 
 # TO ADD/FIX:
-# upon sending a voice note reply with a choose_voice_note_region option
 
 # make sure to delete the temporary file or use the file that telegram provides
