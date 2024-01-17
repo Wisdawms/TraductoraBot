@@ -219,7 +219,11 @@ def translate_two_flags(message):
             from_lang, to_lang, text_to_trans, from_locale, to_locale = check_result[1], check_result[2], check_result[3], check_result[4], check_result[5]
             if text_to_trans is None:
                 if message.reply_to_message.text == choose_language_txt:
-                    text_to_trans = " ".join(global_t_msg.text.split()[1:])
+                    #text_to_trans = " ".join(global_t_msg.text.split()[1:])
+
+                    text_to_trans = global_t_msg.text.split('\n')
+                    text_to_trans[0] = ' '.join(text_to_trans[0].split()[1:])
+                    text_to_trans='\n'.join(text_to_trans)
                     print(' I think I got it its', text_to_trans )
             print("got from, to, and txt_to_trans, from_locale, to_locale")
             print("TXT TO TRANS???", check_result[3])
@@ -245,7 +249,7 @@ def translate_two_flags(message):
                     if text_to_trans:
                         print("found text to trans")
                         if from_lang is None:
-                            from_lang = gtrans.detect(message.text).lang
+                            from_lang = gtrans.detect(text_to_trans).lang
                             if isinstance(from_lang, list) and any(isinstance(item, str) for item in from_lang): # if this is a list and any of the items are str items not chr items
                                 from_lang = from_lang[0]
                             print("from lang at line 153:", from_lang)
