@@ -106,9 +106,34 @@ def contains_country_flag_emoji(text):
 
 def check_flags(message):
     print('hi')
-    msg_parts = message.text.split(None, 1) if message.text else message.split(None, 1)
     to_lang = None
     from_lang = None
+    # if message.text.split()[0].replace(message.text[0],"").lower() in ("en", "english", "انجليزي", "نجليزي", "ن", "🇬🇧") and not message.text.lower().split()[0][0].isalpha() or message.text.lower().split()[0] == "🇬🇧":
+    #     to_lang='en'
+    #     print("NO??????",to_lang)
+    if check_any_en(message) is True:
+        to_lang='en'
+    elif check_any_es(message) is True:
+        to_lang='es'
+    elif check_any_ar(message) is True:
+        to_lang='ar'
+
+    elif check_ar_es(message) is True:
+        to_lang='es'
+    elif check_ar_en(message) is True:
+        to_lang='en'
+
+    elif check_es_en(message) is True:
+        to_lang='en'
+    elif check_es_ar(message) is True:
+        to_lang='ar'
+
+    elif check_en_ar(message) is True:
+        to_lang='ar'
+    elif check_en_es(message) is True:
+        to_lang='es'
+
+    msg_parts = message.text.split(None, 1) if message.text else message.split(None, 1)
     from_locale=None
     to_locale = None
     print("from lang at line 85:", from_lang)
@@ -130,7 +155,11 @@ def check_flags(message):
     if lang_codes_result:
         if message.reply_to_message and message.reply_to_message.content_type == "voice":
             print("VOICE?")
-            translate_voice(message.reply_to_message, lang_codes_result[0], lang_codes_result[1], from_locale, to_locale)
+            if lang_codes_result[0] is not None:
+                from_lang = lang_codes_result[0]
+            if lang_codes_result[1] is not None:
+                to_lang = lang_codes_result[1]
+            translate_voice(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
             return
         
         if contains_country_flag_emoji(msg_parts[0]): # has country flag emoji
@@ -243,7 +272,7 @@ def translate_any_es(message):
     to_lang = 'es'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -266,9 +295,9 @@ def translate_any_es(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 any_ES")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-                    bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
+                    bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=message, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
                 print('464')
         else:
@@ -282,11 +311,12 @@ def check_any_en(message):
     return message.text.split()[0].replace(message.text[0],"").lower() in ("en", "english", "انجليزي", "نجليزي", "ن", "🇬🇧") and not message.text.lower().split()[0][0].isalpha() or message.text.lower().split()[0] == "🇬🇧"
 @bot.message_handler(func=check_any_en)
 def translate_any_en(message):
+    # REPLY TO VOICE AND REPLY TO TEXT
     from_lang = None
     to_lang = 'en'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -309,9 +339,9 @@ def translate_any_en(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 any en")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-                    bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
+                    bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=message, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
                 print('464')
         else:
@@ -329,7 +359,7 @@ def translate_any_ar(message):
     to_lang = 'ar'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -352,7 +382,7 @@ def translate_any_ar(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 any ar")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -373,7 +403,7 @@ def translate_en_es(message):
     to_lang = 'es'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -389,7 +419,7 @@ def translate_en_es(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 en-es")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -408,7 +438,7 @@ def translate_es_en(message):
     to_lang = 'en'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -424,7 +454,7 @@ def translate_es_en(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 es-en")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -442,7 +472,7 @@ def translate_es_ar(message):
     to_lang = 'ar'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -458,7 +488,7 @@ def translate_es_ar(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to AR:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 es-ar")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -477,7 +507,7 @@ def translate_ar_es(message):
     to_lang = 'es'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -493,7 +523,7 @@ def translate_ar_es(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 ar-es")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -511,7 +541,7 @@ def translate_ar_en(message):
     to_lang = 'en'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -527,7 +557,7 @@ def translate_ar_en(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 ar-en")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -545,7 +575,7 @@ def translate_en_ar(message):
     to_lang = 'ar'
     print('ENTERED', from_lang, to_lang)
     try:
-        if message.content_type != "voice" and message.content_type == 'text':
+        if message.reply_to_message.content_type != "voice" and message.reply_to_message.content_type == 'text':
             try:
                 if len(message.text.split()) > 1:
                     text_to_trans = " ".join(message.text.split()[1:])
@@ -561,7 +591,7 @@ def translate_en_ar(message):
                     bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
 
                 else:
-                    print("263")
+                    print("263 en_ar")
                     bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
                     bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=from_lang, from_locale=None, to_locale=None)
             except:
@@ -774,10 +804,13 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
         translation = gtrans.translate(transcription, src=from_lang, dest=to_lang)
         print(transcription,translation.text)
         print(from_locale, to_locale)
-        if from_locale != 'en':
-            bot.reply_to(message, f"\n`Translated from {from_locale}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+        if to_locale != 'en':
+            if recognized_lang is not None:
+                bot.reply_to(message, f"\n`Translated from {recognized_lang}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+            else:
+                bot.reply_to(message, f"\n`Translated from {from_locale}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
         else:
-            bot.reply_to(message, f"\n`Translated from {recognized_lang}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+            bot.reply_to(message, f"\n`Translated from {from_lang}:````\n{transcription}```\n`into {to_lang}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
         # feed to_lang into this function
 
 
@@ -817,3 +850,4 @@ bot.polling()
 # TO ADD/FIX:
 
 # make sure to delete the temporary file or use the file that telegram provides
+#fix /t command when replying to something, only eligible if not replying to something
