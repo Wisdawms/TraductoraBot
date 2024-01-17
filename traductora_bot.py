@@ -10,6 +10,8 @@ from pydub import AudioSegment
 import azure.cognitiveservices.speech as speechsdk
 from babel import Locale
 
+global_t_msg = None
+
 choose_language_txt : str = "Choose a language, or reply with a country-flag emoji to set the destination language:"
 please_reply_txt : str = "reply to this message with the text"
 
@@ -199,9 +201,8 @@ def check_flags(message):
 
 @bot.message_handler(func=check_flags)
 def translate_two_flags(message):
-    
-    print("trans_two_flags")
-
+    global global_t_msg
+    print('again t_msg is:', global_t_msg)
     if message.reply_to_message is not None:
         if extract_lang_codes(message.text)[2] is False and (message.reply_to_message.text == choose_language_txt):
             bot.reply_to(message, "Language code not found. Sorry!")
@@ -216,7 +217,12 @@ def translate_two_flags(message):
         if check_result[0]:
             print("check results index 0 is true")
             from_lang, to_lang, text_to_trans, from_locale, to_locale = check_result[1], check_result[2], check_result[3], check_result[4], check_result[5]
+            if text_to_trans is None:
+                if message.reply_to_message.text == choose_language_txt:
+                    text_to_trans = " ".join(global_t_msg.text.split()[1:])
+                    print(' I think I got it its', text_to_trans )
             print("got from, to, and txt_to_trans, from_locale, to_locale")
+            print("TXT TO TRANS???", check_result[3])
             print(from_locale, to_locale)
             try:
                 if message.reply_to_message is not None and (message.reply_to_message.text not in choose_language_txt or message.reply_to_message.text in please_reply_txt):
@@ -245,6 +251,9 @@ def translate_two_flags(message):
                             print("from lang at line 153:", from_lang)
                         print("from lang at line 160:", from_lang)
                         translation = gtrans.translate(text=text_to_trans, dest=to_lang, src=from_lang).text
+                        if message.reply_to_message.text == choose_language_txt:
+                            bot.reply_to(global_t_msg, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
+                            return
                         bot.reply_to(message, f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to {to_lang.upper()}:\n\n```\n{translation}```",parse_mode='Markdown')
                     else:
                         print("223")
@@ -616,10 +625,15 @@ def gen_markup():
         markup.add(btns[e])
     return markup
 
-@bot.message_handler(func=lambda message: message.text.split()[0].replace(message.text[0],"").lower() in ("t", "translate", "ت") and not message.text.lower().split()[0][0].isalpha() or message.text.lower().split()[0] == "🇪🇸")
+@bot.message_handler( func=lambda message: message.text.split()[0].replace(message.text[0],"").lower() in ("t", "translate", "ت") and not message.text.lower().split()[0][0].isalpha() and message.reply_to_message is None)
 def bot_reply_choose_lang(message):
-    print(message.text)
-    bot.reply_to(message, choose_language_txt, reply_markup=gen_markup())
+    global global_t_msg
+    print("THIS? TEXT??", message.text)
+    #bot.reply_to(message, choose_language_txt, reply_markup=gen_markup())
+    bot.send_message(message.chat.id, choose_language_txt, reply_markup=gen_markup(), reply_to_message_id=message.message_id)
+    global_t_msg = message
+    print('t_msg is:', global_t_msg)
+    bot.register_for_reply(message, translate_two_flags, message)
 
 @bot.callback_query_handler(lambda call: call.message.reply_to_message.content_type != "voice")
 def callback_query(call):
@@ -814,36 +828,36 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
         # feed to_lang into this function
 
 
-def choose_region_reply(message, from_lang, to_lang):
-    print("to_lang at line 529:", to_lang)
+# def choose_region_reply(message, from_lang, to_lang):
+#     print("to_lang at line 529:", to_lang)
 
-    region_markup = telebot.types.InlineKeyboardMarkup(row_width=2)
-    btns = {
-        "euwest_btn" : telebot.types.InlineKeyboardButton("EU West", callback_data="cb_euwest"),
-        "uae_btn" : telebot.types.InlineKeyboardButton("UAE North", callback_data="cb_uae"),
-        "qatar_btn" : telebot.types.InlineKeyboardButton("Qatar Central", callback_data="cb_qatar")
-    }
+#     region_markup = telebot.types.InlineKeyboardMarkup(row_width=2)
+#     btns = {
+#         "euwest_btn" : telebot.types.InlineKeyboardButton("EU West", callback_data="cb_euwest"),
+#         "uae_btn" : telebot.types.InlineKeyboardButton("UAE North", callback_data="cb_uae"),
+#         "qatar_btn" : telebot.types.InlineKeyboardButton("Qatar Central", callback_data="cb_qatar")
+#     }
 
-    for e in btns:
-        region_markup.add(btns[e])
-    bot.reply_to(message, "Choose a speech region from below:", reply_markup=region_markup)
+#     for e in btns:
+#         region_markup.add(btns[e])
+#     bot.reply_to(message, "Choose a speech region from below:", reply_markup=region_markup)
 
-@bot.callback_query_handler(lambda call: True)
-def region_callback(call):
-    match call.data:
-        case "cb_euwest":
-            print("picked eu west")
-            picked_region = "euwest"
-        case "cb_uae":
-            print("picked uae")
-            picked_region = "uaenorth"
-        case "cb_qatar":
-            print("picked qatar")
-            picked_region = "qatar"
+# @bot.callback_query_handler(lambda call: True)
+# def region_callback(call):
+#     match call.data:
+#         case "cb_euwest":
+#             print("picked eu west")
+#             picked_region = "euwest"
+#         case "cb_uae":
+#             print("picked uae")
+#             picked_region = "uaenorth"
+#         case "cb_qatar":
+#             print("picked qatar")
+#             picked_region = "qatar"
     
-    print(picked_region)
-    translate_voice(call.message.reply_to_message, picked_region)
-    bot.delete_message(call.message.chat.id, call.message.message_id)
+#     print(picked_region)
+#     translate_voice(call.message.reply_to_message, picked_region)
+#     bot.delete_message(call.message.chat.id, call.message.message_id)
 
 bot.polling()
 
