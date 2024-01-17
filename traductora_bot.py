@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv
-from numpy import True_
 load_dotenv()
 import telebot
 import requests
@@ -10,6 +9,9 @@ import speech_recognition as sr
 import io
 from pydub import AudioSegment
 from pydub.playback import play
+import azure.cognitiveservices.speech as speechsdk
+
+
 
 global global_from_lang, global_to_lang
 
@@ -140,7 +142,7 @@ def translate_two_flags(message):
             return
         elif message.reply_to_message.content_type == "voice":
             print("reply_message is a voice")
-            translate_voice(message.reply_to_message, from_lang, to_lang, picked_region=None)
+            translate_voice(message.reply_to_message, from_lang, to_lang, picked_region=None)  # noqa: F821
             return
     try:
         check_result = check_two_flags(message)
@@ -220,8 +222,9 @@ def translate_any_es(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to ES:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
 
 
 # ANY - EN (commands are: en, english, نجليزي|انجليزي) EASIEST IS: en
@@ -248,8 +251,9 @@ def translate_any_en(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to EN:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
 
 
 # ANY - AR (commands are: *ar, *arabic) EASIEST IS: *ar
@@ -269,8 +273,9 @@ def translate_any_ar(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from {from_lang.upper()} to AR:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the text or voice note you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg=None, from_lang=None)
 
 # EN - ES (commands are: en-es, *enes, *espanol) EASIEST IS: /enes
 def check_en_es(message):
@@ -285,10 +290,10 @@ def translate_en_es(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇸:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "Please input English text to translate it into Spanish")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the English text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang = 'en')
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the English text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang = 'en')
 
 
 # ES - EN (commands are: es-en, *esen, *ingles) EASIEST IS: ingles
@@ -304,10 +309,10 @@ def translate_es_en(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇬🇧:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "Please input Spanish text to translate it into English")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Spanish text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang='es')
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Spanish text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang='es')
 
 
 # ES - AR (commands are: es-ar, *arabica/arábica, *esar) EASIEST IS: arabica
@@ -324,10 +329,10 @@ def translate_es_ar(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇸 to 🇪🇬:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "Please input Spanish text to translate it into Arabic")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Spanish text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang='es')
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Spanish text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang='es')
 
 
 # AR - ES (commands are: ar-es, *ares, سباني, اسباني, س) EASIEST IS: !س or !سباني
@@ -345,10 +350,10 @@ def translate_ar_es(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇪🇸:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "معلش إكتب حاجة بالعربي عشان تترجمها اساني 😊")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Arabic text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Arabic text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
 
 
 # AR - EN (commands are: ar-en, *aren, نجليزي, انجليزي, ن) EASIEST IS: !نجليزي
@@ -366,10 +371,10 @@ def translate_ar_en(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇪🇬 to 🇬🇧:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "معلش إكتب حاجة بالعربي عشان تترجمها انجليزي 😊")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Arabic text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the Arabic text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
 
 
 # EN - AR (commands are: en-ar, *enar) EASIEST IS: *enar
@@ -387,10 +392,10 @@ def translate_en_ar(message):
             bot.reply_to(message,  f"{message.from_user.first_name}, here's your translation from 🇬🇧 to 🇪🇬:\n\n```\n{translation}```",parse_mode='Markdown')
 
     except:
-        #bot.reply_to(message, "Please input English text to translate into Arabic 😊")
-        bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the English text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
-        flag_msg = message
-        bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
+        if message.reply_to_message.content_type != "voice":
+            bot_reply_msg = bot.send_message(message.chat.id, f"{message.from_user.first_name}, please reply to this message with the English text you wish to translate to {to_lang.upper()}", reply_markup=telebot.types.ForceReply(selective=True), reply_to_message_id=message.message_id)
+            flag_msg = message
+            bot.register_for_reply(bot_reply_msg, handle_trans_reply, to_lang, flag_msg, from_lang)
 
 def gen_markup():
     markup = telebot.types.InlineKeyboardMarkup(row_width=2)
@@ -513,9 +518,24 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, picked_re
         audio_data = recognizer.record(source)
         match picked_region:
             case "euwest":
-                transcription = recognizer.recognize_azure(audio_data, key='a72af3632e1e4ae3826210e3c76b56d9', location='westeurope')[0]
+                #transcription = recognizer.recognize_azure(audio_data, key='a72af3632e1e4ae3826210e3c76b56d9', location='westeurope')[0]
+                speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region="westeurope")
+                audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
+                lang_configs= [speechsdk.languageconfig.SourceLanguageConfig("en-US"),
+                speechsdk.languageconfig.SourceLanguageConfig("es-ES"), speechsdk.languageconfig.SourceLanguageConfig("ar-EG")
+                ]
+                auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(sourceLanguageConfigs=lang_configs)
+                speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,auto_detect_source_language_config=auto_detect_source_language_config,audio_config=audio_config)
+                result = speech_recognizer.recognize_once()
+                if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+                    auto_detect_source_language_result = speechsdk.AutoDetectSourceLanguageResult(result)
+                    transcription = result.text
+                    print("Recognized: {} in language {}".format(result.text, auto_detect_source_language_result.language))
             case "uaenorth":
-                transcription = recognizer.recognize_azure(audio_data, key='b1846da7cbb6402cae4c02b87d636d38', location='uaenorth')[0]
+                transcription = recognizer.recognize_azure(audio_data, key='b1846da7cbb6402cae4c02b87d636d38', location='uaenorth',  language='ar-EG')[0]
+            case "qatar":
+                transcription = recognizer.recognize_azure(audio_data, key='ce5838858ee74d06bb954d8af2da9d1c', location='qatarcentral', language='ar-QA')[0]
+                print("transcribing with the qatar region")
             case None:
                 choose_region_reply(message,from_lang,to_lang)
                 return
@@ -539,6 +559,7 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, picked_re
         translation = gtrans.translate(transcription, src=from_lang, dest=to_lang)
         print(transcription,translation.text)
         bot.reply_to(message, f"Region is {picked_region}\n`Translated from {from_lang.upper()}:````\n{transcription}```\n`into {to_lang.upper()}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+        
         # feed to_lang into this function
 
 
@@ -552,6 +573,7 @@ def choose_region_reply(message, from_lang, to_lang):
     btns = {
         "euwest_btn" : telebot.types.InlineKeyboardButton("EU West", callback_data="cb_euwest"),
         "uae_btn" : telebot.types.InlineKeyboardButton("UAE North", callback_data="cb_uae"),
+        "qatar_btn" : telebot.types.InlineKeyboardButton("Qatar Central", callback_data="cb_qatar")
     }
 
     for e in btns:
@@ -567,6 +589,9 @@ def region_callback(call):
         case "cb_uae":
             print("picked uae")
             picked_region = "uaenorth"
+        case "cb_qatar":
+            print("picked qatar")
+            picked_region = "qatar"
     
     print(picked_region)
     print(global_from_lang, global_to_lang)
