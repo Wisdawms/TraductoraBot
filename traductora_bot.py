@@ -688,22 +688,64 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
         audio_data = recognizer.record(source)
         speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region="westeurope")
         audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
-        lang_configs= [speechsdk.languageconfig.SourceLanguageConfig("en-US"), speechsdk.languageconfig.SourceLanguageConfig("ar-EG")
-        ]
-        auto_detect_source_language_config = speechsdk.languageconfig.AutoDetectSourceLanguageConfig(sourceLanguageConfigs=lang_configs)
+#         locales = [
+#     "af-ZA", "am-ET", "ar-AE", "ar-BH", "ar-DZ", "ar-EG", "ar-IL", "ar-IQ", "ar-JO", "ar-KW",
+#     "ar-LB", "ar-LY", "ar-MA", "ar-OM", "ar-PS", "ar-QA", "ar-SA", "ar-SY", "ar-TN", "ar-YE",
+#     "az-AZ", "bg-BG", "bn-IN", "bs-BA", "ca-ES", "cs-CZ", "cy-GB", "da-DK", "de-AT", "de-CH",
+#     "de-DE", "el-GR", "en-AU", "en-CA", "en-GB", "en-GH", "en-HK", "en-IE", "en-IN", "en-KE",
+#     "en-NG", "en-NZ", "en-PH", "en-SG", "en-TZ", "en-US", "en-ZA", "es-AR", "es-BO", "es-CL",
+#     "es-CO", "es-CR", "es-CU", "es-DO", "es-EC", "es-ES", "es-GQ", "es-GT", "es-HN", "es-MX",
+#     "es-NI", "es-PA", "es-PE", "es-PR", "es-PY", "es-SV", "es-US", "es-UY", "es-VE", "et-EE",
+#     "eu-ES", "fa-IR", "fi-FI", "fil-PH", "fr-BE", "fr-CA", "fr-CH", "fr-FR", "ga-IE", "gl-ES",
+#     "gu-IN", "he-IL", "hi-IN", "hr-HR", "hu-HU", "hy-AM", "id-ID", "is-IS", "it-CH", "it-IT",
+#     "ja-JP", "jv-ID", "ka-GE", "kk-KZ", "km-KH", "kn-IN", "ko-KR", "lo-LA", "lt-LT", "lv-LV",
+#     "mk-MK", "ml-IN", "mn-MN", "mr-IN", "ms-MY", "mt-MT", "my-MM", "nb-NO", "ne-NP", "nl-BE",
+#     "nl-NL", "pa-IN", "pl-PL", "ps-AF", "pt-BR", "pt-PT", "ro-RO", "ru-RU", "si-LK", "sk-SK",
+#     "sl-SI", "so-SO", "sq-AL", "sr-RS", "sv-SE", "sw-KE", "sw-TZ", "ta-IN", "te-IN", "th-TH",
+#     "tr-TR", "uk-UA", "ur-IN", "uz-UZ", "vi-VN", "wuu-CN", "yue-CN", "zh-CN", "zh-CN-shandong",
+#     "zh-CN-sichuan", "zh-HK", "zh-TW", "zu-ZA"
+# ]
+        
+        # Your list of locales
+        locales_2 = ['af-ZA', 'am-ET', 'ar-AE', 'ar-BH', 'ar-DZ', 'ar-EG', 'ar-IL', 'ar-IQ', 'ar-JO', 'ar-KW', 'ar-LB', 'ar-LY', 'ar-MA', 'ar-OM', 'ar-PS', 'ar-QA', 'ar-SA', 'ar-SY', 'ar-TN', 'ar-YE', 'az-AZ', 'bg-BG', 'bn-IN', 'bs-BA', 'ca-ES', 'cs-CZ', 'cy-GB', 'da-DK', 'de-AT', 'de-CH', 'de-DE', 'el-GR', 'en-AU', 'en-CA', 'en-GB', 'en-GH', 'en-HK', 'en-IE', 'en-IN', 'en-KE', 'en-NG', 'en-NZ', 'en-PH', 'en-SG', 'en-TZ', 'en-US', 'en-ZA', 'es-AR', 'es-BO', 'es-CL', 'es-CO', 'es-CR', 'es-CU', 'es-DO', 'es-EC', 'es-ES', 'es-GQ', 'es-GT', 'es-HN', 'es-MX', 'es-NI', 'es-PA', 'es-PE', 'es-PR', 'es-PY', 'es-SV', 'es-US', 'es-UY', 'es-VE', 'et-EE', 'eu-ES', 'fa-IR', 'fi-FI', 'fil-PH', 'fr-BE', 'fr-CA', 'fr-CH', 'fr-FR', 'ga-IE', 'gl-ES', 'gu-IN', 'he-IL', 'hi-IN', 'hr-HR', 'hu-HU', 'hy-AM', 'id-ID', 'is-IS', 'it-CH', 'it-IT', 'ja-JP', 'jv-ID', 'ka-GE', 'kk-KZ', 'km-KH', 'kn-IN', 'ko-KR', 'lo-LA', 'lt-LT', 'lv-LV', 'mk-MK', 'ml-IN', 'mn-MN', 'mr-IN', 'ms-MY', 'mt-MT', 'my-MM', 'nb-NO', 'ne-NP', 'nl-BE', 'nl-NL', 'pa-IN', 'pl-PL', 'ps-AF', 'pt-BR', 'pt-PT', 'ro-RO', 'ru-RU', 'si-LK', 'sk-SK', 'sl-SI', 'so-SO', 'sq-AL', 'sr-RS', 'sv-SE', 'sw-KE', 'sw-TZ', 'ta-IN', 'te-IN', 'th-TH', 'tr-TR', 'uk-UA', 'ur-IN', 'uz-UZ', 'vi-VN', 'wuu-CN', 'yue-CN', 'zh-CN', 'zh-CN-shandong', 'zh-CN-sichuan', 'zh-HK', 'zh-TW', 'zu-ZA']
+       
         if from_lang is None:
             print("NO FROM LANG PROVIDED, USING THE AUTO CONFIG")
-            speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,auto_detect_source_language_config=auto_detect_source_language_config,audio_config=audio_config)
+
+            grouped_locales = [locales_2[i:i+4] for i in range(0, len(locales_2), 4)]
+
+            # Create language configurations for each set
+            lang_configs = []
+
+            for group in grouped_locales:
+                lang_configs.append([speechsdk.languageconfig.SourceLanguageConfig(lang) for lang in group])
+
+            # Create AutoDetectSourceLanguageConfig instances
+            auto_detect_configs = [speechsdk.languageconfig.AutoDetectSourceLanguageConfig(sourceLanguageConfigs=group) for group in lang_configs]
+
+            # Use the configurations in your speech recognizer
+            for auto_detect_config in auto_detect_configs:
+                speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config, auto_detect_source_language_config=auto_detect_config, audio_config=audio_config)
+                result = speech_recognizer.recognize_once()
+                if result.reason == speechsdk.ResultReason.RecognizedSpeech:
+                    print(result)
+                    break
+
         else:
             print("FROM LANG PROVIDED, USING THAT LOCALE")
             speech_recognizer = speechsdk.SpeechRecognizer(speech_config=speech_config,language=from_locale,audio_config=audio_config)
-        result = speech_recognizer.recognize_once()
+            result = speech_recognizer.recognize_once()
+        # Group locales into sets of 4
         
+
         if result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            auto_detect_source_language_result = speechsdk.AutoDetectSourceLanguageResult(result)
+            auto_detect_result = speechsdk.AutoDetectSourceLanguageResult(result)
             transcription = result.text
-            RECOGNIZED_LANG = auto_detect_source_language_result.language
-            print("Recognized: {} in language {}".format(result.text, auto_detect_source_language_result.language))
+            recognized_lang = auto_detect_result.language
+            print("Recognized: {} in language {}".format(transcription, recognized_lang))
+
+            
+
 
         # match picked_region:
         #     case "euwest":
@@ -750,7 +792,7 @@ def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_loca
         if from_locale != 'en':
             bot.reply_to(message, f"\n`Translated from {from_locale}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
         else:
-            bot.reply_to(message, f"\n`Translated from {RECOGNIZED_LANG}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+            bot.reply_to(message, f"\n`Translated from {recognized_lang}:````\n{transcription}```\n`into {to_locale}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
         # feed to_lang into this function
 
 
