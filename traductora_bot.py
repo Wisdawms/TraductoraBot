@@ -9,7 +9,7 @@ from pydub import AudioSegment
 import azure.cognitiveservices.speech as speechsdk
 from babel import Locale
 import io
-from traductora_bot_v2.TraductoraBot.keep_alive import keep_alive
+from keep_alive import *
 
 global_t_msg = None
 
@@ -859,8 +859,6 @@ def handle_trans_reply(message, to_lang, flag_msg, from_lang, from_locale, to_lo
 
 
 def translate_voice(message:telebot.types.Message, from_lang, to_lang, from_locale, to_locale):
-    bot.reply_to(message, "`Sorry! Bot currently doesn't fully support voice-note translation on the host site (repl.it).`",parse_mode="Markdown")
-    return # currently repl.it can't run the speech sdk
 
     voice_note_file_path = bot.get_file(message.voice.file_id).file_path
     print('voice_note_file_path:', voice_note_file_path)
