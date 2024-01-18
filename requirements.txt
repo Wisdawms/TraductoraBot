@@ -74,7 +74,6 @@ psutil==5.9.7
 pure-eval==0.2.2
 pyasn1==0.5.1
 pyasn1-modules==0.3.0
-PyAudio==0.2.14
 pycairo==1.25.1
 pycountry==23.12.11
 pycparser==2.21
@@ -86,7 +85,6 @@ pyTelegramBotAPI==4.14.1
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 pytz==2023.3.post1
-pywin32==306
 pyzmq==25.1.2
 referencing==0.32.1
 requests==2.31.0
