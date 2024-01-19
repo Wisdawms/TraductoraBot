@@ -1,4 +1,5 @@
 import os
+import subprocess
 from dotenv import load_dotenv
 load_dotenv()
 import telebot
@@ -9,6 +10,7 @@ from pydub import AudioSegment, silence
 import azure.cognitiveservices.speech as speechsdk
 from babel import Locale
 from keep_alive import *
+import datetime
 
 BOT_API = os.getenv("API_KEY2")
 bot = telebot.TeleBot(str(BOT_API))
@@ -29,6 +31,11 @@ global_t_msg = None
 choose_language_txt : str = "Choose a language, or reply with a country-flag emoji to set the output language:"
 please_reply_txt : str = "reply to this message with the text"
 
+def delete_sound_files(ogg_file,wav_file):
+    try:
+        os.remove(ogg_file)
+        os.remove(wav_file)
+    except: pass
 
 def get_locale_from_country_code(country_code):
     try:
@@ -167,7 +174,12 @@ def check_flags(message):
                 from_lang = lang_codes_result[0]
             if lang_codes_result[1] is not None:
                 to_lang = lang_codes_result[1]
-            translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+            try:
+                trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+                ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
+            finally:
+                delete_sound_files(ogg_file, wav_file)
+            
             return
 
         if contains_country_flag_emoji(msg_parts[0]): # has country flag emoji
@@ -210,7 +222,12 @@ def translate_two_flags(message):
     print('again t_msg is:', global_t_msg)
     if message.content_type == 'voice':
         print("reply_message is a voice")
-        translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+        try:
+            trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+            ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
+        finally:
+            delete_sound_files(ogg_file, wav_file)
+            
         return
     if message.reply_to_message is not None:
         if extract_language_codes(message.text)[2] is False and (message.reply_to_message.text == choose_language_txt):
@@ -218,7 +235,12 @@ def translate_two_flags(message):
             return
         elif message.reply_to_message.content_type == "voice":
             print("reply_message is a voice")
-            translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+            try:
+                trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+                ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
+            finally:
+                delete_sound_files(ogg_file, wav_file)
+            
             return
     try:
         check_result = check_flags(message)
@@ -803,11 +825,17 @@ def handle_trans_reply(message, to_lang, flag_msg, from_lang, from_locale, to_lo
 
         elif message.content_type == "voice": # reply to bot with voice note to translate
             print("replied to bot with voice note")
-            translate_voice_message(message, from_lang, to_lang, from_locale, to_locale)
+            try:
+                trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+                ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
+            finally:
+                delete_sound_files(ogg_file, wav_file)
+            
         if flag_msg:
             if flag_msg.reply_to_message: # choose a language text
                 bot.delete_message(message.chat.id, flag_msg.reply_to_message.message_id)
             bot.delete_message(message.chat.id, flag_msg.message_id)
+
 
 def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, from_locale, to_locale):
 
@@ -819,15 +847,12 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
 
     voice_data = bot.download_file(voice_note_file_path)
 
-    voice_note_file_path = "voice_note.ogg"
-
+    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    voice_note_file_path = f"voice_note.ogg_{timestamp}"
+    wav_file_name = f'voice_note.wav_{timestamp}'
+    
     with open(voice_note_file_path, 'wb') as voice_file:
         voice_file.write(voice_data)
-
-    # memory_stream = io.BytesIO(voice_data)
-    # memory_stream.seek(0)
-    # content_read = memory_stream.read()
-    # print(content_read)
         
     # Convert the voice note to a format recognized by the speech recognition library
     raw_audio = AudioSegment.from_file(voice_note_file_path, format="ogg")
@@ -837,9 +862,11 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
     for start, end in segments:
         audio += raw_audio[start:end]
 
-    audio.export("voice_note.wav", format="wav")
+    
 
-    audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
+    audio.export(wav_file_name, format="wav")
+    
+    audio_config = speechsdk.audio.AudioConfig(filename=wav_file_name)
     transcription=None
     speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region='westeurope')
     # List of supported locales
@@ -975,6 +1002,8 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
             case 'es':
                 to_lang = 'es-ES'
         bot.reply_to(message, f"\n`Translated from {from_lang}:````\n{transcription}```\n`into {to_lang}:`\n```\n{translation.text}```\n",parse_mode="Markdown")
+    return voice_note_file_path, wav_file_name
 
 keep_alive()
-bot.polling()
+bot.polling(none_stop=True)
+
