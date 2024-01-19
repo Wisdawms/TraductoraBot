@@ -832,7 +832,7 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
     # Convert the voice note to a format recognized by the speech recognition library
     raw_audio = AudioSegment.from_file(voice_note_file_path, format="ogg")
 
-    segments = silence.detect_nonsilent(raw_audio, silence_thresh=-50, min_silence_len=25, seek_step=1) 
+    segments = silence.detect_nonsilent(raw_audio, silence_thresh=-40, min_silence_len=200, seek_step=1) 
     audio = AudioSegment.silent() 
     for start, end in segments:
         audio += raw_audio[start:end]
