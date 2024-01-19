@@ -5,7 +5,7 @@ import telebot
 import requests
 from googletrans import Translator
 import re
-from pydub import AudioSegment
+from pydub import AudioSegment, silence
 import azure.cognitiveservices.speech as speechsdk
 from babel import Locale
 from keep_alive import *
@@ -830,7 +830,13 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
     # print(content_read)
         
     # Convert the voice note to a format recognized by the speech recognition library
-    audio = AudioSegment.from_file(voice_note_file_path, format="ogg")
+    raw_audio = AudioSegment.from_file(voice_note_file_path, format="ogg")
+
+    segments = silence.detect_nonsilent(raw_audio, silence_thresh=-50, min_silence_len=25, seek_step=1) 
+    audio = AudioSegment.silent() 
+    for start, end in segments:
+        audio += raw_audio[start:end]
+
     audio.export("voice_note.wav", format="wav")
 
     audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
