@@ -835,7 +835,7 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
 
     audio_config = speechsdk.audio.AudioConfig(filename='voice_note.wav')
     transcription=None
-    speech_config = speechsdk.SpeechConfig(subscription=REGION_KEY, region=REGION_NAME)
+    speech_config = speechsdk.SpeechConfig(subscription='a72af3632e1e4ae3826210e3c76b56d9', region='westeurope')
     # List of supported locales
     locales_2 = ['en-US', 'es-ES','ar-AE', 'fr-FR','ja-JP', 'zh-CN', 'hi-IN', 'id-ID', 'pt-BR', 'ru-RU', 'bn-IN', 'vi-VN', 'ur-IN', 'de-DE', 'ko-KR', 'it-IT', 'tr-TR', 'ta-IN', 'fil-PH', 'pl-PL', 'uk-UA', 'ro-RO', 'nl-NL', 'th-TH', 'el-GR', 'cs-CZ', 'hu-HU', 'sv-SE', 'he-IL', 'ms-MY', 'ml-IN', 'te-IN', 'da-DK', 'fi-FI', 'sk-SK', 'nb-NO', 'zh-CN-shandong', 'yue-CN', 'zh-CN-sichuan', 'zh-HK', 'zh-TW', 'zu-ZA', 'ca-ES', 'my-MM', 'is-IS', 'lv-LV', 'lt-LT', 'mk-MK', 'si-LK', 'sl-SI', 'sq-AL', 'hy-AM', 'eu-ES', 'hr-HR', 'sr-RS', 'bs-BA', 'ka-GE', 'kk-KZ', 'mt-MT', 'km-KH', 'kn-IN', 'lo-LA', 'mr-IN', 'mn-MN', 'ne-NP', 'ps-AF', 'pa-IN', 'en-ZA', 'gl-ES', 'gu-IN', 'it-CH', 'jv-ID', 'nl-BE', 'pt-PT', 'sw-KE', 'sw-TZ', 'af-ZA', 'am-ET', 'ar-BH', 'ar-DZ', 'ar-EG', 'ar-IL', 'ar-IQ', 'ar-JO', 'ar-KW', 'ar-LB', 'ar-LY', 'ar-MA', 'ar-OM', 'ar-PS', 'ar-QA', 'ar-SA', 'ar-SY', 'ar-TN', 'ar-YE', 'az-AZ', 'bg-BG', 'cy-GB', 'de-AT', 'de-CH', 'en-AU', 'en-CA', 'en-GB', 'en-GH', 'en-HK', 'en-IE', 'en-IN', 'en-KE', 'en-NG', 'en-NZ', 'en-PH', 'en-SG', 'en-TZ', 'es-AR', 'es-BO', 'es-CL', 'es-CO', 'es-CR', 'es-CU', 'es-DO', 'es-EC', 'es-GQ', 'es-GT', 'es-HN', 'es-MX', 'es-NI', 'es-PA', 'es-PE', 'es-PR', 'es-PY', 'es-SV', 'es-US', 'es-UY', 'es-VE', 'et-EE', 'fa-IR', 'fr-BE', 'fr-CA', 'fr-CH', 'ga-IE', 'so-SO', 'uz-UZ', 'wuu-CN']
 
