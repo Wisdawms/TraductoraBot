@@ -20,7 +20,7 @@ REGION_NAME = os.getenv('REGION_NAME')
 
 @bot.message_handler(commands=["start"])
 def start(message):
-    bot.send_message(message.chat.id,"You can use the country-flag emojis to translate stuff!\n\nExamples:\n🇬🇧 [text] -> This will translate any input text to English\n\n🇬🇧 🇪🇸 [text] -> This will translate from English to Spanish\n\nOr you can just send a flag emoji then reply with the text that you want to translate.\n\nYou can also reply to a message with a country-flag emoji to instantly translate it to that language! _Try it out by replying to this message with the Spain country-flag emoji_ 🇪🇸.\n\n`You can still use the two-emoji format when replying to force the source language instead of having the translation API detect it.`\n",parse_mode="Markdown")
+    bot.send_message(message.chat.id,"You can use the country-flag emojis to translate stuff!\n\nExamples:\n🇬🇧 [text] -> This will translate any input text to English\n\n🇬🇧 🇪🇸 [text] -> This will translate from English to Spanish\n\nOr you can just send a flag emoji then reply with the text that you want to translate.\n\nYou can also reply to a message with a country-flag emoji to instantly translate it to that language! _Try it out by replying to this message with the Spain country-flag emoji_ 🇪🇸.\n\n`You can still use the two-emoji format when replying to force the source language instead of having the translation API detect it.`\n\n```⚠️WARNING: Please don't send in any sensitive data or information through either the text messages or voice-notes, as in order for the bot to work, it has to read this data.```",parse_mode="Markdown")
 
 @bot.message_handler(commands=["help"])
 def help(message):
