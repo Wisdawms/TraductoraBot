@@ -177,9 +177,7 @@ def check_flags(message):
                 trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
-                try:
-                    delete_sound_files(ogg_file, wav_file)
-                except: pass
+                delete_sound_files(ogg_file, wav_file)
             
             return
 
@@ -227,9 +225,8 @@ def translate_two_flags(message):
             trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
             ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
         finally:
-            try:
-                delete_sound_files(ogg_file, wav_file)
-            except: pass
+            delete_sound_files(ogg_file, wav_file)
+            
         return
     if message.reply_to_message is not None:
         if extract_language_codes(message.text)[2] is False and (message.reply_to_message.text == choose_language_txt):
@@ -241,9 +238,8 @@ def translate_two_flags(message):
                 trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
-                try:
-                    delete_sound_files(ogg_file, wav_file)
-                except: pass
+                delete_sound_files(ogg_file, wav_file)
+            
             return
     try:
         check_result = check_flags(message)
@@ -829,12 +825,11 @@ def handle_trans_reply(message, to_lang, flag_msg, from_lang, from_locale, to_lo
         elif message.content_type == "voice": # reply to bot with voice note to translate
             print("replied to bot with voice note")
             try:
-                trans_voice_results = translate_voice_message(message.reply_to_message, from_lang, to_lang, from_locale, to_locale)
+                trans_voice_results = translate_voice_message(message, from_lang, to_lang, from_locale, to_locale)
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
-                try:
-                    delete_sound_files(ogg_file, wav_file)
-                except: pass
+                delete_sound_files(ogg_file, wav_file)
+            
         if flag_msg:
             if flag_msg.reply_to_message: # choose a language text
                 bot.delete_message(message.chat.id, flag_msg.reply_to_message.message_id)
@@ -1010,4 +1005,3 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
 
 keep_alive()
 bot.polling(none_stop=True)
-
