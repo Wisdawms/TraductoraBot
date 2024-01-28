@@ -1,12 +1,12 @@
 import os
 from dotenv import load_dotenv
-load_dotenv()
-import telebot
+load_dotenv() # loading secret API KEYS from .env
+import telebot # telegram bot API
 import requests
-from googletrans import Translator
+from googletrans import Translator # google translation API
 import re
-from pydub import AudioSegment, silence
-import azure.cognitiveservices.speech as speechsdk
+from pydub import AudioSegment, silence # using PyDub to get the non-silent parts of a voice recording
+import azure.cognitiveservices.speech as speechsdk # using Microsoft Azure for speech transcription
 from babel import Locale
 from keep_alive import *
 import datetime
@@ -49,7 +49,7 @@ def get_locale_from_country_code(country_code):
         # Handle the case where an invalid country code is provided
         return None
 
-def get_language_code(country_code):
+def get_language_code(country_code): 
     try:
         url = f"https://restcountries.com/v2/alpha/{country_code}"
         response = requests.get(url)
@@ -123,7 +123,7 @@ def check_flags(message):
         to_lang='en'
     elif check_any_es(message) is True:
         to_lang='es'
-    elif check_any_ar(message) is True:
+    # elif check_any_ar(message) is True:
         to_lang='ar'
 
     elif check_ar_es(message) is True:
@@ -178,7 +178,7 @@ def check_flags(message):
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
                 delete_sound_files(ogg_file, wav_file)
-            
+        
             return
 
         if contains_country_flag_emoji(msg_parts[0]): # has country flag emoji
@@ -239,7 +239,6 @@ def translate_two_flags(message):
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
                 delete_sound_files(ogg_file, wav_file)
-            
             return
     try:
         check_result = check_flags(message)
@@ -893,10 +892,10 @@ def translate_voice_message(message:telebot.types.Message, from_lang, to_lang, f
             result = speech_recognizer.recognize_once()
             try:
                 if isinstance(gtrans.detect(result.text).confidence, list):
-                    if gtrans.detect(result.text).confidence[0] > 0.81:
+                    if gtrans.detect(result.text).confidence[0] > 0.70:
                         break
                 else:
-                    if gtrans.detect(result.text).confidence > 0.81:
+                    if gtrans.detect(result.text).confidence > 0.70:
                         break
             except:
                 pass
