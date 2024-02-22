@@ -178,7 +178,7 @@ def check_flags(message):
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
                 delete_sound_files(ogg_file, wav_file)
-        
+            
             return
 
         if contains_country_flag_emoji(msg_parts[0]): # has country flag emoji
@@ -239,6 +239,7 @@ def translate_two_flags(message):
                 ogg_file, wav_file = trans_voice_results[0], trans_voice_results[1]
             finally:
                 delete_sound_files(ogg_file, wav_file)
+            
             return
     try:
         check_result = check_flags(message)
